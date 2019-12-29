@@ -20,7 +20,7 @@ function sendrequest() {
     };
 
     var all_headers_list = document.getElementById("headers_modal_content").children;
-    xmlHttp.open( $("#request_type :selected").text(), document.getElementById("parse_url").value, false );
+    xmlHttp.open( $("#request_type :selected").text(), document.getElementById("parse_url").value, false);
     for (var index = 0; index < all_headers_list.length; ++index) {
         var main_id = all_headers_list[index].id;
         xmlHttp.setRequestHeader(document.getElementById(main_id+"_key").value, document.getElementById(main_id+"_value").value);
