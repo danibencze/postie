@@ -39,6 +39,10 @@ function sendrequest() {
         create_progress_child("ERROR: Couldn't reach the server")
     }
     var t1 = performance.now();
+    create_progress_child("Time: "+Math.round((t1 - t0))+" ms");
+    create_progress_child("Status: "+xmlHttp.status);
+    create_progress_child("Headers: "+(xmlHttp.getAllResponseHeaders().split(/:+\s/).length-1));
+    create_progress_child("Response: "+xmlHttp.response.length+" char");
     document.getElementById("return_headers").innerText = xmlHttp.getAllResponseHeaders();
     editor.setValue(xmlHttp.response);
     var returnheader = xmlHttp.getResponseHeader("content-type");
@@ -52,9 +56,6 @@ function sendrequest() {
     } else{
         editor.session.setMode("ace/mode/plain_text");
     }
-    create_progress_child("Time: "+Math.round((t1 - t0))+" ms");
-    create_progress_child("Status: "+xmlHttp.status);
-    create_progress_child("Response: "+xmlHttp.response.length+" char");
     document.getElementById("html_iframe").srcdoc = xmlHttp.response;
     document.getElementById("raw_response").value = xmlHttp.response;
     return xmlHttp.response;
