@@ -1,0 +1,357 @@
+* {margin: 0; padding: 0; border: 0; vertical-align: baseline;}
+html {box-sizing: border-box;}
+*, *:before, *:after {box-sizing: inherit;}
+
+html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #616161;
+}
+body {
+  border: 1px solid rgba(30, 30, 30, 0.82);
+  overflow-y: hidden;
+  box-sizing: border-box;
+  padding-bottom: 2px;
+}
+
+
+
+#title{
+  font-size: 13px;
+  margin-left: 6px;
+  font-weight: bold;
+}
+
+#titlebar {
+  display: block;
+  position: fixed;
+  height: 32px;
+  width: calc(100% - 2px);
+}
+
+#titlebar {
+  padding: 4px;
+}
+#titlebar #drag-region {
+  width: 100%;
+  height: 100%;
+  -webkit-app-region: drag;
+}
+#titlebar {
+  color: #BBB;
+}
+#titlebar #drag-region {
+  display: grid;
+  grid-template-columns: auto 138px;
+}
+#window-title {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  overflow-x: hidden;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12px;
+}
+#window-title span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5;
+}
+#window-controls {
+  display: grid;
+  grid-template-columns: repeat(3, 46px);
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  font-family: "Segoe MDL2 Assets";
+  font-size: 10px;
+}
+#window-controls {
+  -webkit-app-region: no-drag;
+}
+#window-controls .button {
+  grid-row: 1 / span 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+#window-controls .button {
+  user-select: none;
+  cursor: default;
+  color: #BBB;
+}
+#window-controls .button:hover {
+  background: rgba(255,255,255,0.2);
+  color: #FFF;
+}
+#window-controls #min-button {
+  grid-column: 1;
+}
+#window-controls #max-button, #window-controls #restore-button {
+  grid-column: 2;
+}
+#window-controls #restore-button {
+  display: none;
+}
+#window-controls #close-button {
+  grid-column: 3;
+}
+#window-controls #close-button:hover {
+  background: #E81123;
+}
+
+#main {
+  height: calc(100% - 32px);
+  margin-top: 32px;
+  overflow-y: auto;
+  background-color: #f1f1f1;
+  padding: 15px;
+}
+
+#settings-tab{
+  height: calc(100% - 32px);
+  margin-top: 32px;
+  overflow-y: auto;
+  background-color: #f1f1f1;
+  padding: 15px;
+  display: none;
+}
+
+
+#gobutton{
+  margin-left: 15px;
+}
+
+h1 {
+  margin: 0 0 10px 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+p {
+  margin-top: 10px;
+  color: rgba(255,255,255,0.4);
+}
+
+* {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+.faux-input {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 0px;
+  height: 0;
+  overflow: hidden;
+  padding: 0;
+  opacity: 0;
+}
+
+.term {
+  background: #e8e8e8;
+  width: 100%;
+  height: 100%;
+  color: #aaa;
+  font-family: Monaco, monospace;
+  font-weight: 400;
+  font-smooth: never;
+  -webkit-font-smoothing : none;
+  font-size: 10.5pt;
+  padding: 3px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  display: block;
+  line-height: 1.2em;
+  overflow-y: scroll;
+  position: relative;
+  color: #888;
+}
+
+.term-focus {
+  text-shadow: none;
+  color: #ccc;
+}
+
+.term .red {
+  color: red;
+}
+.term .blue {
+  color: blue;
+}
+.term .white {
+  color: #fff;
+}
+.term .bold {
+  font-weight: bold;
+}
+
+.bell {
+  width: 0.1em;
+  height: 1.1em;
+  line-height: 1.2em;
+  background: #fff;
+  position: absolute;
+  animation: flash 1s infinite;
+}
+
+@keyframes flash {
+  0% {
+    visibility: visible;
+  }
+  49% {
+    visibility: visible;
+  }
+  50% {
+    visibility: hidden;
+  }
+  99% {
+    visibility: hidden;
+  }
+  100% {
+    visibility: visible;
+  }
+}
+
+/* Let's get this party started */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #111;
+}
+
+a{
+  color: #424242;
+}
+
+#myTabContent{
+  padding: 10px;
+}
+
+#editor{
+  overflow: scroll;
+  height: 100%;
+  margin-top: 10px;
+}
+
+#body_editor{
+  overflow: scroll;
+  height: 100%;
+  margin-top: 10px;
+}
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+::-webkit-scrollbar{
+  width: 2px;
+}
+
+.ace-scrollbar-h{
+  height: 2px;
+}
+
+textarea {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: calc(100% - 175px);
+    width: 100%;
+}
+
+#request_type{
+  cursor: pointer;
+  background-color: #f1f1f1;
+}
+
+#request_type:hover{
+  background-color: rgb(253, 253, 253);
+}
+
+.bar-btn{
+  border:1px solid #b3b9bf
+}
+
+.bar-btn:hover{
+  background-color: rgb(253, 253, 253);
+}
+
+.settings-container{
+  display: inline-block;
+  cursor: pointer;
+  -webkit-app-region:no-drag;
+}
+
+.bar1, .bar2, .bar3 {
+  width: 20px;
+  height: 1px;
+  background-color: #BBB;
+  margin: 3px 0;
+  transition: 0.4s;
+}
+
+.change .bar1 {
+  -webkit-transform: rotate(-45deg) translate(-6px, 0px);
+  transform: rotate(-45deg) translate(-6px, 0px);
+}
+
+.change .bar2 {opacity: 0;}
+
+.change .bar3 {
+  -webkit-transform: rotate(45deg) translate(-5px, 0px);
+  transform: rotate(45deg) translate(-5px,0px);
+}

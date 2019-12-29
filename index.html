@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Postie</title>
+<link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <!-- Bootstrap CSS -->
+
+
+  </head>
+  <body>
+
+    <header id="titlebar">
+      <div id="drag-region">
+        <div id="window-title">
+          <!--<img style="width: 24px;height: 24px" src="postielogo/postie-logo.ico">-->
+          <div class="settings-container" onclick="settingstoggle(this)">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+          </div>
+          <span id="title">Postie</span>
+        </div>
+
+        <div id="window-controls">
+          <div class="button" id="min-button">
+            <span>&#xE921;</span>
+          </div>
+          <div class="button" id="max-button">
+            <span>&#xE922;</span>
+          </div>
+          <div class="button" id="restore-button">
+            <span>&#xE923;</span>
+          </div>
+          <div class="button" id="close-button">
+            <span>&#xE8BB;</span>
+          </div>
+
+        </div>
+      </div>
+    </header>
+    <div id="settings-tab">Test</div>
+    <div id="main">
+        <div id="headers_modal" class="modal">
+          <!-- Modal content -->
+          <div class="modal-content">
+            <div id="headers_modal_content"></div>
+            <button  style="width: 100%" onclick="add_header()" type="button" class="btn btn-outline-secondary">+</button>
+          </div>
+        </div>
+        <div id="body_modal" class="modal">
+          <!-- Modal content -->
+          <div class="modal-content" style="height: 75%;">
+              <select class="custom-select form-control mb-1 bar-btn" id="content_type">
+                <option value="0" selected>Request type (none)</option>
+                <option value="application/x-www-form-urlencoded">FORM URL Encoded (application/x-www-form-urlencoded)</option>
+                <option value="application/json">JSON (application/json)</option>
+                <option value="text/html">HTML (text/html)</option>
+                <option value="application/xml">XML (application/xml)</option>
+                <option value="text/plain">TEXT (text/plain)</option>
+              </select>
+              <pre id="body_editor"></pre>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+          <select class="custom-select form-control mb-1 bar-btn" id="request_type">
+                <option value="0" selected>GET</option>
+                <option value="1">POST</option>
+                <option value="2">PUT</option>
+                <option value="3">DELETE</option>
+          </select>
+          </div>
+          <input id="parse_url" type="text" class="form-control" aria-label="URL">
+          <div class="input-group-append">
+            <button id="body_modal_open" class="form-control btn bar-btn"  type="button">Body
+            <span id="bodylength" class="badge badge-info">0</span>
+            </button>
+          </div>
+          <div class="input-group-append">
+            <button id="headers_modal_open" class="form-control btn bar-btn"  type="button">Headers
+              <span id="totalheaders" class="badge badge-info">0</span>
+            </button>
+          </div>
+        <div class="input-group-append">
+          <button onclick="sendrequest()" class="form-control btn bar-btn"  type="button">Go</button>
+        </div>
+        </div>
+      <nav aria-label="breadcrumb">
+        <ol id="tracker" class="breadcrumb" style="background-color: white">Ready
+        </ol>
+      </nav>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="home-tab" data-toggle="tab" href="#pretty" role="tab" aria-controls="pretty" aria-selected="true">Pretty</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="header-tab" data-toggle="tab" href="#return_headers" role="tab" aria-controls="return_headers" aria-selected="false">Headers</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="profile-tab" data-toggle="tab" href="#raw" role="tab" aria-controls="raw" aria-selected="false">Raw</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="contact-tab" data-toggle="tab" href="#html" role="tab" aria-controls="html" aria-selected="false">Render</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent" style="display: contents">
+        <div class="tab-pane fade show active" style="height: calc(100% - 175px)" id="pretty" role="tabpanel" aria-labelledby="pretty-tab">
+          <pre id="editor"></pre>
+        </div>
+        <div class="tab-pane fade" style="height: calc(100% - 175px);padding: 1%" id="return_headers" role="tabpanel" aria-labelledby="header-tab">
+        </div>
+        <div class="tab-pane fade" style="height: calc(100% - 175px)" id="raw" role="tabpanel" aria-labelledby="raw-tab">
+          <textarea style="height: 100%" id="raw_response"></textarea>
+        </div>
+        <div class="tab-pane fade" id="html" role="tabpanel" aria-labelledby="html-tab" style="height: calc(100% - 164px)">
+          <iframe id="html_iframe" style="height:100%;width: 100%;"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      require('./renderer.js');
+    </script>
+  <!-- Bootstrap Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="ace-builds-1.4.7/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/chrome");
+        editor.session.setMode("ace/mode/javascript");
+        var body_editor = ace.edit("body_editor");
+        body_editor.setTheme("ace/theme/chrome");
+        body_editor.session.setMode("ace/mode/plain_text");
+    </script>
+    <script>let $ = require('jquery');</script>
+    <script>require('popper.js');</script>
+    <script>require('bootstrap');</script>
+    <script>var beautify = require('js-beautify').js</script>
+    <script>
+      $("#parse_url").on('keyup', function (e) {
+        if (e.keyCode === 13) {
+            sendrequest();
+            }
+        });
+
+      function btfy() {
+          console.log(editor.session.getMode().$id);
+          if(editor.session.getMode().$id==="ace/mode/javascript"){
+              console.log("btfy:OK");
+              var val = editor.session.getValue();
+            //Remove leading spaces
+              var array = val.split(/\n/);
+              array[0] = array[0].trim();
+              val = array.join("\n");
+            //Actual beautify (prettify)
+              val = beautify(val);
+            //Change current text to formatted text
+              editor.session.setValue(val);
+          }
+      }
+
+      function settingstoggle(x) {
+        x.classList.toggle("change");
+        if (x.classList.contains("change")){
+          document.getElementById("settings-tab").style.display ="block";
+          document.getElementById("main").style.display ="none"
+        }else{
+          document.getElementById("main").style.display ="block";
+          document.getElementById("settings-tab").style.display ="none";
+        }
+      }
+    </script>
+  <script src="engine.js"></script>
+  </body>
+</html>
