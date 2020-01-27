@@ -40,8 +40,41 @@
         </div>
       </div>
     </header>
-    <div id="settings-tab">Good find.. settings will be coming soon</div>
+    <div id="settings-tab">
+      <div class="card" style="padding: 10px">
+        <div>What to keep track of:</div>
+        <div class="card-body">
+          <div class="btn-group btn-group-toggle" data-toggle="buttons" style="width: 100%">
+            <label class="btn btn-outline-secondary" id="no_track_label">
+              <input type="radio" name="options" class="history_settings" id="no_track" autocomplete="off" style="border-right: 2px solid white"> Nothing (No history will be recorded)
+            </label>
+            <label class="btn btn-outline-secondary" id="minimal_track_label">
+              <input type="radio" name="options" class="history_settings" id="minimal_track" autocomplete="off" style="border-right: 2px solid white"> Only URLs
+            </label>
+            <label class="btn btn-outline-secondary disabled" id="full_track_label">
+              <input type="radio" name="options" class="history_settings" id="full_track" autocomplete="off" disabled> Everything (URL, Body, Response, etc.)
+            </label>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="card" style="padding: 10px">
+        <div >Warning this will delete everything what's saved. (Might take a second or two)</div>
+        <div class="card-body"><button id="cache_dlt_btn" class="form-control btn btn-outline-danger"  type="button" onclick="reset_cache()">Reset cache</button></div>
+      </div>
+      <hr>
+      <div class="card" style="padding: 10px">
+        <div >Developer console (if you want to see what's going on under the hood)</div>
+        <div class="card-body"><button class="form-control btn btn-outline-secondary"  type="button" onclick="dev_console()">Open developer console</button></div>
+      </div>
+      <hr>
+    </div>
     <div id="main">
+    <div style="width: 14%;height: 100%;margin-right: 1%">
+        <ul class="list-group" id="history_scroll">
+        </ul>
+    </div>
+      <div style="width: 85%">
         <div id="headers_modal" class="modal">
           <!-- Modal content -->
           <div class="modal-content">
@@ -71,9 +104,10 @@
                 <option value="2">PUT</option>
                 <option value="3">DELETE</option>
                 <option value="4">OPTIONS</option>
+                <option value="5">HEAD</option>
           </select>
           </div>
-          <input id="parse_url" type="text" class="form-control" aria-label="URL">
+          <input id="parse_url" type="text" class="form-control autosave" aria-label="URL">
           <div class="input-group-append">
             <button id="body_modal_open" class="form-control btn bar-btn"  type="button">Body
             <span id="bodylength" class="badge badge-info">0</span>
@@ -107,7 +141,7 @@
         </li>
       </ul>
       <div class="tab-content" id="myTabContent" style="display: contents">
-        <div class="tab-pane fade show active" style="height: calc(100% - 175px)" id="pretty" role="tabpanel" aria-labelledby="pretty-tab">
+        <div class="tab-pane fade show active" id="pretty" role="tabpanel" aria-labelledby="pretty-tab">
           <pre id="editor"></pre>
         </div>
         <div class="tab-pane fade" style="height: calc(100% - 175px);padding: 1%" id="return_headers" role="tabpanel" aria-labelledby="header-tab">
@@ -119,7 +153,7 @@
           <iframe id="html_iframe" style="height:100%;width: 100%;"></iframe>
         </div>
       </div>
-    </div>
+    </div></div>
 
     <script>
       require('./renderer.js');
@@ -140,6 +174,24 @@
     <script>require('bootstrap');</script>
     <script>var beautify = require('js-beautify').js</script>
     <script>
+      var path = require("path");
+      var fs = require('fs');
+      const debounce = (func, delay) => {
+        let inDebounce;
+        return function() {
+          const context = this;
+          const args = arguments;
+          clearTimeout(inDebounce);
+          inDebounce = setTimeout(() => func.apply(context, args), delay)
+        }
+      }
+      const electron = require('electron');
+      //init appdata to store metadata locally
+      const userDataPath = (electron.app || electron.remote.app).getPath(
+        'userData'
+      );
+      console.log(userDataPath);
+
       $("#parse_url").on('keyup', function (e) {
         if (e.keyCode === 13) {
             sendrequest();
@@ -168,10 +220,82 @@
           document.getElementById("settings-tab").style.display ="block";
           document.getElementById("main").style.display ="none"
         }else{
-          document.getElementById("main").style.display ="block";
+          document.getElementById("main").style.display ="inline-flex";
           document.getElementById("settings-tab").style.display ="none";
+          save_all();
         }
       }
+
+      //TODO: Finish off autosave functions
+      //TODO: Also to load in the saved data
+      $(".autosave").on("input",debounce(function() {
+          console.log("Change to " + this.value);
+          save_all();
+      },1000));
+
+      function save_all() {
+        var content = JSON.stringify({
+          "current_url":document.getElementById("parse_url").value,
+          "return_content":editor.session.getValue(),
+          "headers":[],
+          "return_headers": document.getElementById("return_headers").innerText,
+          "body":body_editor.session.getValue(),
+          "history":document.getElementById("history_scroll").innerHTML
+        });
+        try { fs.writeFileSync(path.join(userDataPath,'status.json'), content, 'utf-8'); }
+        catch(e) { console.log(e) }
+        var history_option = "";
+        if(document.getElementById("minimal_track").checked){
+          history_option = "minimal_track"
+        }else{
+          history_option = "no_track"
+        }
+        console.log(history_option);
+        var settings = JSON.stringify({
+          "history":history_option,
+        });
+        try { fs.writeFileSync(path.join(userDataPath,'settings.json'), settings, 'utf-8'); }
+        catch(e) { console.log(e) }
+      }
+
+      function body_length_count() {
+      document.getElementById("bodylength").innerText = body_editor.session.getValue().length;
+      }
+
+      function startupload() {
+        try{
+          var obj = JSON.parse(fs.readFileSync(path.join(userDataPath,'status.json'), 'utf8'));
+          body_editor.session.setValue(obj["body"]);
+          document.getElementById("parse_url").value = obj["current_url"];
+          editor.session.setValue(obj["return_content"]);
+          document.getElementById("return_headers").innerText = obj["return_headers"];
+          document.getElementById("raw_response").value = obj["return_content"];
+          if (obj["history"]) {
+            document.getElementById("history_scroll").innerHTML = obj["history"];
+          }
+          btfy();
+          body_length_count();
+        }catch (e) {
+          console.log("No config file found")
+        }
+        var settings = {};
+        try{
+          settings = JSON.parse(fs.readFileSync(path.join(userDataPath,'settings.json'), 'utf8'));
+        }catch (e) {
+          console.log("No settings... going default it is")
+        }
+        console.log(settings);
+        if(settings["history"]){
+          document.getElementById(settings["history"]).checked = true;
+          document.getElementById(settings["history"]+"_label").classList.add("active");
+        }else{
+          document.getElementById("minimal_track").checked = true;
+          document.getElementById("minimal_track_label").classList.add("active")
+        }
+      }
+
+      startupload();
+
     </script>
   <script src="engine.js"></script>
   </body>

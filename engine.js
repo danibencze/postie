@@ -1,5 +1,6 @@
 function sendrequest() {
-    reset_ui();
+    reset_progress();
+    var url = document.getElementById("parse_url").value;
     if (testurl(document.getElementById("parse_url").value)){
         create_progress_child("URL: ok")
     }else{
@@ -20,7 +21,7 @@ function sendrequest() {
     };
 
     var all_headers_list = document.getElementById("headers_modal_content").children;
-    xmlHttp.open( $("#request_type :selected").text(), document.getElementById("parse_url").value, false);
+    xmlHttp.open( $("#request_type :selected").text(), url, false);
     for (var index = 0; index < all_headers_list.length; ++index) {
         var main_id = all_headers_list[index].id;
         xmlHttp.setRequestHeader(document.getElementById(main_id+"_key").value, document.getElementById(main_id+"_value").value);
@@ -39,6 +40,7 @@ function sendrequest() {
         create_progress_child("ERROR: Couldn't reach the server")
     }
     var t1 = performance.now();
+    create_history(url,xmlHttp.status);
     create_progress_child("Time: "+Math.round((t1 - t0))+" ms");
     create_progress_child("Status: "+xmlHttp.status);
     create_progress_child("Headers: "+(xmlHttp.getAllResponseHeaders().split(/:+\s/).length-1));
@@ -46,7 +48,7 @@ function sendrequest() {
     document.getElementById("return_headers").innerText = xmlHttp.getAllResponseHeaders();
     editor.setValue(xmlHttp.response);
     var returnheader = xmlHttp.getResponseHeader("content-type");
-    if (returnheader==="application/json"){
+    if (returnheader==="application/json" || returnheader.includes("json")){
         editor.session.setMode("ace/mode/javascript");
         btfy();
     }else if (returnheader.includes("xml")){
@@ -58,6 +60,7 @@ function sendrequest() {
     }
     document.getElementById("html_iframe").srcdoc = xmlHttp.response;
     document.getElementById("raw_response").value = xmlHttp.response;
+    save_all();
     return xmlHttp.response;
 }
 
@@ -90,13 +93,21 @@ function create_progress_child(content) {
     document.getElementById('tracker').appendChild(child);
 }
 
-function reset_ui() {
+function reset_progress() {
     document.getElementById("tracker").innerHTML="";
 }
 
-function headerspopup() {
-    
+function reset_ui() {
+    document.getElementById("tracker").innerHTML="Ready";
+    editor.session.setValue("");
+    document.getElementById("return_headers").innerHTML="";
+    document.getElementById("raw_response").innerHTML="";
+    document.getElementById("html_iframe").srcdoc="";
+    body_editor.session.setValue("");
+    document.getElementById("headers_modal_content").innerHTML="";
+
 }
+
 
 var head_modal = document.getElementById("headers_modal");
 var body_modal = document.getElementById("body_modal");
@@ -124,9 +135,10 @@ window.onclick = function(event) {
   }else if(event.target == body_modal){
       body_modal.style.display = "none";
       document.getElementById("myTabContent").style.display = "contents";
-      document.getElementById("bodylength").innerText = body_editor.session.getValue().length;
+      body_length_count()
   }
 };
+
 
 function remove_header(id) {
     document.getElementById(id).remove();
@@ -159,3 +171,50 @@ $('#content_type').on('change', function() {
       body_editor.session.setMode("ace/mode/plain_text");
   }
 });
+
+function reset_cache() {
+    document.getElementById("cache_dlt_btn").innerHTML ="<img style='height: 15px;width: 100px' src='build/loader.gif'>";
+    var rimraf = require("rimraf");
+    rimraf(userDataPath, function () {
+        const remote = require('electron').remote;
+        remote.app.relaunch();
+        remote.app.exit(0);
+    });
+}
+
+function create_history(url,status) {
+    if(document.getElementById("minimal_track").checked) {
+        var node = document.createElement("LI");
+        node.classList.add("list-group-item");
+        node.setAttribute("onclick", "reload_history_elem(this)");
+        var pres_url = document.createElement("B");
+        var status_indicator = document.createElement("SPAN");
+        if (status.toString().indexOf("2") === 0) {
+            status_indicator.style.color = "#28a745";
+        } else {
+            status_indicator.style.color = "#dc3545";
+        }
+        status_indicator.innerText = status;
+        node.appendChild(status_indicator);
+        pres_url.appendChild(document.createTextNode(url));
+        node.appendChild(pres_url);
+        var d = Date.now();
+        d = new Date(d);
+        d = (d.getDate() + '/' + d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + (d.getHours() > 12 ? d.getHours() - 12 : d.getHours()) + ':' + d.getMinutes() + ' ' + (d.getHours() >= 12 ? "PM" : "AM");
+        node.appendChild(document.createTextNode(d));
+        var list = document.getElementById("history_scroll");
+        list.insertBefore(node, list.childNodes[0]);
+    }
+}
+
+function reload_history_elem(element){
+    reset_ui();
+    document.getElementById("parse_url").value = element.innerText.split("\n")[1]
+
+}
+
+function dev_console() {
+    const remote = require('electron').remote;
+    remote.BrowserWindow.getFocusedWindow().webContents.openDevTools();
+    console.log(remote.app.mainWindow)
+}

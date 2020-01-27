@@ -1,10 +1,10 @@
 {
   "name": "postie",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A tool for testing and using http APIs",
   "main": "main.js",
   "scripts": {
-    "start": "electron --enable-transparent-visuals --disable-gpu ."
+    "start": "electron --enable-transparent-visuals ."
   },
   "repository": {
     "type": "git",
@@ -27,21 +27,22 @@
     "custom-electron-titlebar": "^3.0.8",
     "jquery": "^3.3.1",
     "js-beautify": "^1.10.2",
-    "popper.js": "^1.14.4"
+    "popper.js": "^1.14.4",
+    "rimraf": "^3.0.0"
   },
   "bugs": {
     "url": "https://github.com/danibencze/postie/issues"
   },
   "build": {
-  "win":{
-    "target": "nsis",
-    "icon": "build/icon.ico",
-    "publisherName": "Dani Bencze"
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico",
+      "publisherName": "Dani Bencze"
+    },
+    "appId": "com.danibencze.postie",
+    "productName": "Postie",
+    "buildVersion": "0.2",
+    "copyright": "danibencze"
   },
-  "appId": "com.danibencze.postie",
-  "productName": "Postie",
-  "buildVersion": "0.1",
-  "copyright": "danibencze"
-},
   "homepage": "https://github.com/danibencze/postie#readme"
 }
