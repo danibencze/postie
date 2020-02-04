@@ -1,7 +1,7 @@
 {
   "name": "postie",
-  "version": "0.2.0",
-  "description": "A tool for testing and using http APIs",
+  "version": "0.2.1",
+  "description": "A tool for testing and consuming http APIs",
   "main": "main.js",
   "scripts": {
     "start": "electron --enable-transparent-visuals ."
@@ -41,7 +41,7 @@
     },
     "appId": "com.danibencze.postie",
     "productName": "Postie",
-    "buildVersion": "0.2",
+    "buildVersion": "0.2.1",
     "copyright": "danibencze"
   },
   "homepage": "https://github.com/danibencze/postie#readme"

@@ -1,4 +1,125 @@
+      var path = require("path");
+      var fs = require('fs');
+      const debounce = (func, delay) => {
+        let inDebounce;
+        return function() {
+          const context = this;
+          const args = arguments;
+          clearTimeout(inDebounce);
+          inDebounce = setTimeout(() => func.apply(context, args), delay)
+        }
+      };
+      const electron = require('electron');
+      //init appdata to store metadata locally
+      const userDataPath = (electron.app || electron.remote.app).getPath(
+        'userData'
+      );
+      console.log(userDataPath);
+
+      $("#parse_url").on('keyup', function (e) {
+        if (e.keyCode === 13) {
+            sendrequest();
+            }
+        });
+
+      function btfy() {
+          console.log(editor.session.getMode().$id);
+          if(editor.session.getMode().$id==="ace/mode/javascript"){
+              console.log("btfy:OK");
+              var val = editor.session.getValue();
+            //Remove leading spaces
+              var array = val.split(/\n/);
+              array[0] = array[0].trim();
+              val = array.join("\n");
+            //Actual beautify (prettify)
+              val = beautify(val);
+            //Change current text to formatted text
+              editor.session.setValue(val);
+          }
+      }
+
+      function settingstoggle(x) {
+        x.classList.toggle("change");
+        if (x.classList.contains("change")){
+          document.getElementById("settings-tab").style.display ="block";
+          document.getElementById("main").style.display ="none"
+        }else{
+          document.getElementById("main").style.display ="inline-flex";
+          document.getElementById("settings-tab").style.display ="none";
+          save_all();
+        }
+      }
+
+      //TODO: Finish off autosave functions
+      //TODO: Also to load in the saved data
+      $(".autosave").on("input",debounce(function() {
+          console.log("Change to " + this.value);
+          save_all();
+      },1000));
+
+      function save_all() {
+        var content = JSON.stringify({
+          "current_url":document.getElementById("parse_url").value,
+          "return_content":editor.session.getValue(),
+          "headers":[],
+          "return_headers": document.getElementById("return_headers").innerText,
+          "body":body_editor.session.getValue(),
+          "history":document.getElementById("history_scroll").innerHTML
+        });
+        try { fs.writeFileSync(path.join(userDataPath,'status.json'), content, 'utf-8'); }
+        catch(e) { console.log(e) }
+        var history_option = "";
+        if(document.getElementById("minimal_track").checked){
+          history_option = "minimal_track"
+        }else{
+          history_option = "no_track"
+        }
+        console.log(history_option);
+        var settings = JSON.stringify({
+          "history":history_option,
+        });
+        try { fs.writeFileSync(path.join(userDataPath,'settings.json'), settings, 'utf-8'); }
+        catch(e) { console.log(e) }
+      }
+
+      function body_length_count() {
+      document.getElementById("bodylength").innerText = body_editor.session.getValue().length;
+      }
+
+      function startupload() {
+        try{
+          var obj = JSON.parse(fs.readFileSync(path.join(userDataPath,'status.json'), 'utf8'));
+          body_editor.session.setValue(obj["body"]);
+          document.getElementById("parse_url").value = obj["current_url"];
+          editor.session.setValue(obj["return_content"]);
+          document.getElementById("return_headers").innerText = obj["return_headers"];
+          document.getElementById("raw_response").value = obj["return_content"];
+          if (obj["history"]) {
+            document.getElementById("history_scroll").innerHTML = obj["history"];
+          }
+          btfy();
+          body_length_count();
+        }catch (e) {
+          console.log("No config file found")
+        }
+        var settings = {};
+        try{
+          settings = JSON.parse(fs.readFileSync(path.join(userDataPath,'settings.json'), 'utf8'));
+        }catch (e) {
+          console.log("No settings... going default it is")
+        }
+        console.log(settings);
+        if(settings["history"]){
+          document.getElementById(settings["history"]).checked = true;
+          document.getElementById(settings["history"]+"_label").classList.add("active");
+        }else{
+          document.getElementById("minimal_track").checked = true;
+          document.getElementById("minimal_track_label").classList.add("active")
+        }
+      }
+
 function sendrequest() {
+    //TODO: add https://forums.asp.net/t/1129474.aspx?How+can+i+use+xmlhttp+to+request+a+https+url
     reset_progress();
     var url = document.getElementById("parse_url").value;
     if (testurl(document.getElementById("parse_url").value)){
@@ -53,7 +174,7 @@ function sendrequest() {
         btfy();
     }else if (returnheader.includes("xml")){
         editor.session.setMode("ace/mode/xml");
-    }else if (returnheader==="application/html"||returnheader ==="text/html"){
+    }else if (returnheader.includes("html")){
         editor.session.setMode("ace/mode/html");
     } else{
         editor.session.setMode("ace/mode/plain_text");
@@ -101,7 +222,7 @@ function reset_ui() {
     document.getElementById("tracker").innerHTML="Ready";
     editor.session.setValue("");
     document.getElementById("return_headers").innerHTML="";
-    document.getElementById("raw_response").innerHTML="";
+    document.getElementById("raw_response").value="";
     document.getElementById("html_iframe").srcdoc="";
     body_editor.session.setValue("");
     document.getElementById("headers_modal_content").innerHTML="";
@@ -173,7 +294,7 @@ $('#content_type').on('change', function() {
 });
 
 function reset_cache() {
-    document.getElementById("cache_dlt_btn").innerHTML ="<img style='height: 15px;width: 100px' src='build/loader.gif'>";
+    document.getElementById("cache_dlt_btn_loader").innerHTML ="<div class='loader'></div>";
     var rimraf = require("rimraf");
     rimraf(userDataPath, function () {
         const remote = require('electron').remote;
@@ -216,5 +337,35 @@ function reload_history_elem(element){
 function dev_console() {
     const remote = require('electron').remote;
     remote.BrowserWindow.getFocusedWindow().webContents.openDevTools();
-    console.log(remote.app.mainWindow)
+    console.log(remote.app.mainWindow);
+    console.log(remote.app.getVersion());
+    console.log(remote.app.getAppPath())
+}
+
+function update_app() {
+    const remote = require('electron').remote;
+    var current_version = remote.app.getVersion().replace(/\./g,"");
+    console.log(current_version);
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", "https://api.github.com/repos/danibencze/postie/releases/latest", false);
+    xmlHttp.send();
+    var most_recent_availible = JSON.parse(xmlHttp.responseText);
+    if (parseInt(most_recent_availible["tag_name"].replace(/\./g,"").parseInt)>parseInt(current_version)){
+        console.log("Start update");
+        document.getElementById("update_btn").innerHTML ="<div class='loader'></div>";
+        console.log(most_recent_availible["assets"][0]["browser_download_url"]);
+        const https = require('https');
+        const fs = require('fs');
+
+        const file = fs.createWriteStream(most_recent_availible["assets"][0]["name"]);
+        const request = https.get(most_recent_availible["assets"][0]["browser_download_url"], function(response) {
+            response.pipe(file);
+            document.getElementById("update_btn").innerHTML ="You can find the new version in the same location"
+        });
+    }else{
+        console.log("You are up to date");
+        document.getElementById("update_btn").style.borderColor = "#28a745";
+        document.getElementById("update_btn").innerHTML ="You are up to date";
+    }
+
 }
