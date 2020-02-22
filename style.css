@@ -403,3 +403,32 @@ textarea {
   height: calc(100% - 166px)
 }
 
+.loader {
+  border: 12px solid #6c757d;
+  border-radius: 50%;
+  border-top: 12px solid #ffffff;
+  width: 12px;
+  height: 12px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  margin-left: 48%;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+SSS
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.runner-btn{
+  width: 12%;
+  margin-left: 3%;
+  height: 100%;
+  padding: .75rem 1rem
+}
+

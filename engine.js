@@ -369,3 +369,10 @@ function update_app() {
     }
 
 }
+
+function spawn_runner_window() {
+  const remote = require('electron').remote;
+  const BrowserWindow = remote.BrowserWindow;
+  const win = new BrowserWindow({width: 600, height: 600, backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico'});
+  win.loadFile('runner.html');
+}
