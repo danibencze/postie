@@ -7,6 +7,14 @@ const electron = require('electron');
       );
 var obj = JSON.parse(fs.readFileSync(path.join(userDataPath,'status.json'), 'utf8'));
 document.getElementById("parse_url").value = obj["current_url"];
+var os = require('os');
+try {
+    // get recommended number of threads based on number of cores
+    // divided by two as that count include virtual threads as well...
+    document.getElementById("threads").value = parseInt(os.cpus().length/2);
+}catch (e) {
+    console.log(e)
+}
 
 function create_result_element(result) {
     var node = document.createElement("LI");
@@ -74,11 +82,11 @@ function create_graph(pid,latency,return_code) {
                 data: {
                     labels: pid,
                     datasets: [{
-                        label: 'Response time',
+                        label: 'Response time (ms)',
                         borderColor: '#17a2b8',
                         data: latency
                     },{
-                        label: 'Return code',
+                        label: 'Return code (http codes)',
                         borderColor: '#5ab879',
                         data: return_code
                     }
@@ -86,7 +94,12 @@ function create_graph(pid,latency,return_code) {
                 },
 
                 // Configuration options go here
-                options: {}
+                options: {
+                    elements: {
+                        line: {
+                            tension: 0
+                        }
+                    }}
             });
 }
 
