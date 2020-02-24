@@ -46,7 +46,6 @@
         }else{
           document.getElementById("main").style.display ="inline-flex";
           document.getElementById("settings-tab").style.display ="none";
-          save_all();
         }
       }
 
@@ -58,10 +57,19 @@
       },1000));
 
       function save_all() {
+          var headers = [];
+          for (let i = 1; i <= document.getElementById("headers_modal_content").children.length; i++) {
+              console.log("saving");
+              var interheaders = [];
+              interheaders.push(document.getElementById(i+"_header_key").value);
+              interheaders.push(document.getElementById(i+"_header_value").value);
+              headers.push(interheaders)
+          }
+          console.log(headers);
         var content = JSON.stringify({
           "current_url":document.getElementById("parse_url").value,
           "return_content":editor.session.getValue(),
-          "headers":[],
+          "headers":headers,
           "return_headers": document.getElementById("return_headers").innerText,
           "body":body_editor.session.getValue(),
           "history":document.getElementById("history_scroll").innerHTML
@@ -89,6 +97,16 @@
       function startupload() {
         try{
           var obj = JSON.parse(fs.readFileSync(path.join(userDataPath,'status.json'), 'utf8'));
+          console.log(obj["headers"]);
+          for (let i = 0; i < obj["headers"].length; i++) {
+              console.log("trying..");
+              add_header();
+              console.log("header created");
+              document.getElementById((i+1)+"_header_key").value = obj["headers"][i][0];
+              document.getElementById((i+1)+"_header_value").value = obj["headers"][i][1];
+              console.log("bits added")
+          }
+          display_header_count();
           body_editor.session.setValue(obj["body"]);
           document.getElementById("parse_url").value = obj["current_url"];
           editor.session.setValue(obj["return_content"]);
@@ -252,13 +270,18 @@ window.onclick = function(event) {
   if (event.target == head_modal) {
     head_modal.style.display = "none";
     document.getElementById("myTabContent").style.display = "contents";
-      document.getElementById("totalheaders").innerText=document.getElementById("headers_modal_content").childElementCount;
+    display_header_count();
   }else if(event.target == body_modal){
       body_modal.style.display = "none";
       document.getElementById("myTabContent").style.display = "contents";
       body_length_count()
   }
+  save_all();
 };
+
+function display_header_count() {
+    document.getElementById("totalheaders").innerText=document.getElementById("headers_modal_content").childElementCount;
+}
 
 
 function remove_header(id) {
@@ -368,4 +391,12 @@ function update_app() {
         document.getElementById("update_btn").innerHTML ="You are up to date";
     }
 
+}
+
+function spawn_runner_window() {
+  save_all();
+  const remote = require('electron').remote;
+  const BrowserWindow = remote.BrowserWindow;
+  const win = new BrowserWindow({width: 1000,frame: false, transparent : true, height: 600, backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico'});
+  win.loadFile('runner.html');
 }

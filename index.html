@@ -128,11 +128,14 @@
           <button onclick="sendrequest()" class="form-control btn bar-btn"  type="button">Go</button>
         </div>
         </div>
-      <nav aria-label="breadcrumb">
-        <ol id="tracker" class="breadcrumb" style="background-color: white">Ready
-        </ol>
-      </nav>
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <div style="display: inline-flex; width: 100%">
+          <nav aria-label="breadcrumb" style="width: 85%">
+            <ol id="tracker" class="breadcrumb" style="background-color: white">Ready
+            </ol>
+          </nav>
+          <button onclick="spawn_runner_window()" class="form-control btn bar-btn runner-btn"  type="button">Runner</button>
+        </div>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
           <a class="nav-link active" id="home-tab" data-toggle="tab" href="#pretty" role="tab" aria-controls="pretty" aria-selected="true">Pretty</a>
         </li>

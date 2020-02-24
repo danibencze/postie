@@ -7,7 +7,7 @@ let mainWindow;
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1200, height: 800, frame: false, transparent : true, backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico'});
+  mainWindow = new BrowserWindow({width: 1200, height: 800, frame: false,resizable: true, transparent : true, backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico'});
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html');
