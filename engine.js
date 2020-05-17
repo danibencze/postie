@@ -72,6 +72,8 @@
           "headers":headers,
           "return_headers": document.getElementById("return_headers").innerText,
           "body":body_editor.session.getValue(),
+          "search_bar":document.getElementById("history_filter").value,
+          "content_type":document.getElementById("content_type").value,
           "history":document.getElementById("history_scroll").innerHTML
         });
         try { fs.writeFileSync(path.join(userDataPath,'status.json'), content, 'utf-8'); }
@@ -109,9 +111,11 @@
           display_header_count();
           body_editor.session.setValue(obj["body"]);
           document.getElementById("parse_url").value = obj["current_url"];
+          document.getElementById("history_filter").value = obj["search_bar"];
           editor.session.setValue(obj["return_content"]);
           document.getElementById("return_headers").innerText = obj["return_headers"];
           document.getElementById("raw_response").value = obj["return_content"];
+          document.getElementById("content_type").value = obj["content_type"];
           if (obj["history"]) {
             document.getElementById("history_scroll").innerHTML = obj["history"];
           }
