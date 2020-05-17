@@ -160,6 +160,7 @@ function sendrequest() {
     };
 
     var all_headers_list = document.getElementById("headers_modal_content").children;
+    console.log(all_headers_list);
     xmlHttp.open( $("#request_type :selected").text(), url, false);
     for (var index = 0; index < all_headers_list.length; ++index) {
         var main_id = all_headers_list[index].id;
@@ -169,9 +170,14 @@ function sendrequest() {
     if ($("#content_type :selected").val()!="0"){
         xmlHttp.setRequestHeader("Content-Type",$("#content_type :selected").val())
     }
+    console.log(xmlHttp.headers);
     var t0 = performance.now();
     try {
-        xmlHttp.send(JSON.stringify(body_editor.session.getValue()));
+        //TODO: Fix this weird JSON error
+        console.log(body_editor.session.getValue());
+        var payload = body_editor.session.getValue();
+        console.log(payload);
+        xmlHttp.send(payload);
     }catch (e) {
         console.log("error catch")
     }
@@ -349,6 +355,26 @@ function create_history(url,status) {
         var list = document.getElementById("history_scroll");
         list.insertBefore(node, list.childNodes[0]);
     }
+}
+
+function filter_history() {
+  // Declare variables
+  var input, filter, ul, li, b, i, txtValue;
+  input = document.getElementById('history_filter');
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("history_scroll");
+  li = ul.getElementsByTagName('li');
+
+  // Loop through all list items, and hide those who don't match the search query
+  for (i = 0; i < li.length; i++) {
+    b = li[i].getElementsByTagName("b")[0];
+    txtValue = b.textContent || b.innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
 }
 
 function reload_history_elem(element){

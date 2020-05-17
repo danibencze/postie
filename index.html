@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <title>Postie</title>
-<link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="../postie/node_modules/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../postie/style.css" />
     <!-- Bootstrap CSS -->
 
 
@@ -76,7 +76,15 @@
       <hr>
     </div>
     <div id="main">
-    <div style="width: 14%;height: 100%;margin-right: 1%">
+    <div style="width: 14%;height: 94%;margin-right: 1%">
+      <div style="height: 5%;width: 100%;margin-bottom: 2%">
+        <div class="input-group input-group-sm mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Search</span>
+          </div>
+          <input oninput="filter_history()" id="history_filter" type="text" class="form-control" aria-label="Seach" aria-describedby="inputGroup-sizing-sm">
+        </div>
+      </div>
         <ul class="list-group" id="history_scroll">
         </ul>
     </div>
@@ -165,11 +173,11 @@
     </div></div>
 
     <script>
-      require('./renderer.js');
+      require('../postie/renderer.js');
     </script>
   <!-- Bootstrap Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="ace-builds-1.4.7/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../postie/ace-builds-1.4.7/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
     <script>
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/chrome");
@@ -182,7 +190,7 @@
     <script>require('popper.js');</script>
     <script>require('bootstrap');</script>
     <script>var beautify = require('js-beautify').js</script>
-    <script src="engine.js"></script>
+    <script src="../postie/engine.js"></script>
     <script>
       startupload();
     </script>
