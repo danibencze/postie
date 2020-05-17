@@ -167,9 +167,11 @@ function sendrequest() {
         xmlHttp.setRequestHeader(document.getElementById(main_id+"_key").value, document.getElementById(main_id+"_value").value);
 
     }
-    if ($("#content_type :selected").val()!="0"){
-        xmlHttp.setRequestHeader("Content-Type",$("#content_type :selected").val())
+    var content_type= $("#content_type :selected").val();
+    if (content_type !== "0"){
+        xmlHttp.setRequestHeader("Content-type",content_type)
     }
+    console.log("headres here");
     console.log(xmlHttp.headers);
     var t0 = performance.now();
     try {
