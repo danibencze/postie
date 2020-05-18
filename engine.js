@@ -429,6 +429,6 @@ function spawn_runner_window() {
   save_all();
   const remote = require('electron').remote;
   const BrowserWindow = remote.BrowserWindow;
-  const win = new BrowserWindow({width: 1000,frame: false, transparent : true, height: 600, backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico'});
+  const win = new BrowserWindow({width: 1000,frame: false, transparent : true, height: 600, backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico',webPreferences: { nodeIntegration: true }});
   win.loadFile('runner.html');
 }
