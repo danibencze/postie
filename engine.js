@@ -74,6 +74,7 @@
           "body":body_editor.session.getValue(),
           "search_bar":document.getElementById("history_filter").value,
           "content_type":document.getElementById("content_type").value,
+          "current_request_type":document.getElementById("request_type").value,
           "history":document.getElementById("history_scroll").innerHTML
         });
         try { fs.writeFileSync(path.join(userDataPath,'status.json'), content, 'utf-8'); }
@@ -113,6 +114,7 @@
           document.getElementById("parse_url").value = obj["current_url"];
           document.getElementById("history_filter").value = obj["search_bar"];
           editor.session.setValue(obj["return_content"]);
+          document.getElementById("request_type").value = obj["current_request_type"];
           document.getElementById("return_headers").innerText = obj["return_headers"];
           document.getElementById("raw_response").value = obj["return_content"];
           document.getElementById("content_type").value = obj["content_type"];
