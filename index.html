@@ -76,7 +76,15 @@
       <hr>
     </div>
     <div id="main">
-    <div style="width: 14%;height: 100%;margin-right: 1%">
+    <div style="width: 14%;height: 94%;margin-right: 1%">
+      <div style="height: 5%;width: 100%;margin-bottom: 2%">
+        <div class="input-group input-group-sm mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-sm">Search</span>
+          </div>
+          <input oninput="filter_history()" id="history_filter" type="text" class="form-control" aria-label="Seach" aria-describedby="inputGroup-sizing-sm">
+        </div>
+      </div>
         <ul class="list-group" id="history_scroll">
         </ul>
     </div>

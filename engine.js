@@ -72,6 +72,8 @@
           "headers":headers,
           "return_headers": document.getElementById("return_headers").innerText,
           "body":body_editor.session.getValue(),
+          "search_bar":document.getElementById("history_filter").value,
+          "content_type":document.getElementById("content_type").value,
           "history":document.getElementById("history_scroll").innerHTML
         });
         try { fs.writeFileSync(path.join(userDataPath,'status.json'), content, 'utf-8'); }
@@ -109,9 +111,11 @@
           display_header_count();
           body_editor.session.setValue(obj["body"]);
           document.getElementById("parse_url").value = obj["current_url"];
+          document.getElementById("history_filter").value = obj["search_bar"];
           editor.session.setValue(obj["return_content"]);
           document.getElementById("return_headers").innerText = obj["return_headers"];
           document.getElementById("raw_response").value = obj["return_content"];
+          document.getElementById("content_type").value = obj["content_type"];
           if (obj["history"]) {
             document.getElementById("history_scroll").innerHTML = obj["history"];
           }
@@ -160,18 +164,26 @@ function sendrequest() {
     };
 
     var all_headers_list = document.getElementById("headers_modal_content").children;
+    console.log(all_headers_list);
     xmlHttp.open( $("#request_type :selected").text(), url, false);
     for (var index = 0; index < all_headers_list.length; ++index) {
         var main_id = all_headers_list[index].id;
         xmlHttp.setRequestHeader(document.getElementById(main_id+"_key").value, document.getElementById(main_id+"_value").value);
 
     }
-    if ($("#content_type :selected").val()!="0"){
-        xmlHttp.setRequestHeader("Content-Type",$("#content_type :selected").val())
+    var content_type= $("#content_type :selected").val();
+    if (content_type !== "0"){
+        xmlHttp.setRequestHeader("Content-type",content_type)
     }
+    console.log("headres here");
+    console.log(xmlHttp.headers);
     var t0 = performance.now();
     try {
-        xmlHttp.send(JSON.stringify(body_editor.session.getValue()));
+        //TODO: Fix this weird JSON error
+        console.log(body_editor.session.getValue());
+        var payload = body_editor.session.getValue();
+        console.log(payload);
+        xmlHttp.send(payload);
     }catch (e) {
         console.log("error catch")
     }
@@ -351,6 +363,26 @@ function create_history(url,status) {
     }
 }
 
+function filter_history() {
+  // Declare variables
+  var input, filter, ul, li, b, i, txtValue;
+  input = document.getElementById('history_filter');
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("history_scroll");
+  li = ul.getElementsByTagName('li');
+
+  // Loop through all list items, and hide those who don't match the search query
+  for (i = 0; i < li.length; i++) {
+    b = li[i].getElementsByTagName("b")[0];
+    txtValue = b.textContent || b.innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+
 function reload_history_elem(element){
     reset_ui();
     document.getElementById("parse_url").value = element.innerText.split("\n")[1]
@@ -397,6 +429,6 @@ function spawn_runner_window() {
   save_all();
   const remote = require('electron').remote;
   const BrowserWindow = remote.BrowserWindow;
-  const win = new BrowserWindow({width: 1000,frame: false, transparent : true, height: 600, backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico'});
+  const win = new BrowserWindow({width: 1000,frame: false, transparent : true, height: 600, backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico',webPreferences: { nodeIntegration: true }});
   win.loadFile('runner.html');
 }
