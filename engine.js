@@ -407,7 +407,7 @@ function update_app() {
     xmlHttp.open( "GET", "https://api.github.com/repos/danibencze/postie/releases/latest", false);
     xmlHttp.send();
     var most_recent_availible = JSON.parse(xmlHttp.responseText);
-    if (parseInt(most_recent_availible["tag_name"].replace(/\./g,"").parseInt)>parseInt(current_version)){
+    if (parseInt(most_recent_availible["tag_name"].replace(/\./g,""))>parseInt(current_version)){
         console.log("Start update");
         document.getElementById("update_btn").innerHTML ="<div class='loader'></div>";
         console.log(most_recent_availible["assets"][0]["browser_download_url"]);
