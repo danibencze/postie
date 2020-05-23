@@ -145,8 +145,8 @@
           document.getElementById(settings["history"]).checked = true;
           document.getElementById(settings["history"]+"_label").classList.add("active");
         }else{
-          document.getElementById("minimal_track").checked = true;
-          document.getElementById("minimal_track_label").classList.add("active")
+          document.getElementById("full_track").checked = true;
+          document.getElementById("full_track_label").classList.add("active")
         }
       }
 

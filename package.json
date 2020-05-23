@@ -1,6 +1,6 @@
 {
   "name": "postie",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A tool for testing and consuming http APIs",
   "main": "main.js",
   "scripts": {
@@ -45,7 +45,7 @@
     },
     "appId": "com.danibencze.postie",
     "productName": "Postie",
-    "buildVersion": "0.4.0",
+    "buildVersion": "0.4.1",
     "copyright": "danibencze"
   },
   "homepage": "https://github.com/danibencze/postie#readme"
