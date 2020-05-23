@@ -56,7 +56,7 @@
           save_all();
       },1000));
 
-      function save_all() {
+      function getheaders() {
           var headers = [];
           for (let i = 1; i <= document.getElementById("headers_modal_content").children.length; i++) {
               console.log("saving");
@@ -65,12 +65,15 @@
               interheaders.push(document.getElementById(i+"_header_value").value);
               headers.push(interheaders)
           }
-          console.log(headers);
+          return headers
+      }
+
+      function save_all() {
         var content = JSON.stringify({
           "current_url":document.getElementById("parse_url").value,
           "return_content":editor.session.getValue(),
-          "headers":headers,
-          "return_headers": document.getElementById("return_headers").innerText,
+          "headers":getheaders(),
+          "return_headers": document.getElementById("return_headers").innerHTML,
           "body":body_editor.session.getValue(),
           "search_bar":document.getElementById("history_filter").value,
           "content_type":document.getElementById("content_type").value,
@@ -82,6 +85,8 @@
         var history_option = "";
         if(document.getElementById("minimal_track").checked){
           history_option = "minimal_track"
+        }else if(document.getElementById("full_track").checked){
+            history_option = "full_track"
         }else{
           history_option = "no_track"
         }
@@ -101,6 +106,7 @@
         try{
           var obj = JSON.parse(fs.readFileSync(path.join(userDataPath,'status.json'), 'utf8'));
           console.log(obj["headers"]);
+          //TODO: Create function for header creation from arrays
           for (let i = 0; i < obj["headers"].length; i++) {
               console.log("trying..");
               add_header();
@@ -121,6 +127,8 @@
           if (obj["history"]) {
             document.getElementById("history_scroll").innerHTML = obj["history"];
           }
+          $('#content_type').trigger("change");
+          display_header_count();
           btfy();
           body_length_count();
         }catch (e) {
@@ -193,7 +201,6 @@ function sendrequest() {
         create_progress_child("ERROR: Couldn't reach the server")
     }
     var t1 = performance.now();
-    create_history(url,xmlHttp.status);
     create_progress_child("Time: "+Math.round((t1 - t0))+" ms");
     create_progress_child("Status: "+xmlHttp.status);
     create_progress_child("Headers: "+(xmlHttp.getAllResponseHeaders().split(/:+\s/).length-1));
@@ -213,6 +220,7 @@ function sendrequest() {
     }
     document.getElementById("html_iframe").srcdoc = xmlHttp.response;
     document.getElementById("raw_response").value = xmlHttp.response;
+    create_history(url,xmlHttp.status);
     save_all();
     return xmlHttp.response;
 }
@@ -341,7 +349,7 @@ function reset_cache() {
 }
 
 function create_history(url,status) {
-    if(document.getElementById("minimal_track").checked) {
+    if(document.getElementById("minimal_track").checked || document.getElementById("full_track").checked  ) {
         var node = document.createElement("LI");
         node.classList.add("list-group-item");
         node.setAttribute("onclick", "reload_history_elem(this)");
@@ -360,6 +368,13 @@ function create_history(url,status) {
         d = new Date(d);
         d = (d.getDate() + '/' + d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + (d.getHours() > 12 ? d.getHours() - 12 : d.getHours()) + ':' + d.getMinutes() + ' ' + (d.getHours() >= 12 ? "PM" : "AM");
         node.appendChild(document.createTextNode(d));
+        if (document.getElementById("full_track").checked){
+            var datastore = document.createElement("DIV");
+            datastore.innerText = serialize_current_state();
+            datastore.style.display = "none";
+            datastore.classList.add("datastore");
+            node.appendChild(datastore)
+        }
         var list = document.getElementById("history_scroll");
         list.insertBefore(node, list.childNodes[0]);
     }
@@ -387,7 +402,31 @@ function filter_history() {
 
 function reload_history_elem(element){
     reset_ui();
-    document.getElementById("parse_url").value = element.innerText.split("\n")[1]
+    document.getElementById("parse_url").value = element.innerText.split("\n")[1];
+    console.log(element.children);
+    if (element.querySelector(".datastore")){
+        var history_element = JSON.parse(element.querySelector(".datastore").innerText);
+        console.log(history_element);
+        body_editor.session.setValue(history_element["body"]);
+        editor.session.setValue(history_element["return_content"]);
+        document.getElementById("content_type").value = history_element["content_type"];
+        document.getElementById("raw_response").value = history_element["return_content"];
+        document.getElementById("request_type").value = parseInt(history_element["current_request_type"]);
+        for (let i = 0; i < history_element["headers"].length; i++) {
+              add_header();
+              document.getElementById((i+1)+"_header_key").value = history_element["headers"][i][0];
+              document.getElementById((i+1)+"_header_value").value = history_element["headers"][i][1];
+          }
+        var return_hdrs = history_element["return_headers"].split("\n");
+        for(let n = 0; n < return_hdrs; n++){
+            document.getElementById("return_headers").innerHTML += return_hdrs[n];
+            document.getElementById("return_headers").innerHTML += "<br>";
+        }
+    }
+    $('#content_type').trigger("change");
+    btfy();
+    body_length_count();
+    display_header_count();
 
 }
 
@@ -407,7 +446,7 @@ function update_app() {
     xmlHttp.open( "GET", "https://api.github.com/repos/danibencze/postie/releases/latest", false);
     xmlHttp.send();
     var most_recent_availible = JSON.parse(xmlHttp.responseText);
-    if (parseInt(most_recent_availible["tag_name"].replace(/\./g,"").parseInt)>parseInt(current_version)){
+    if (parseInt(most_recent_availible["tag_name"].replace(/\./g,""))>parseInt(current_version)){
         console.log("Start update");
         document.getElementById("update_btn").innerHTML ="<div class='loader'></div>";
         console.log(most_recent_availible["assets"][0]["browser_download_url"]);
@@ -433,4 +472,16 @@ function spawn_runner_window() {
   const BrowserWindow = remote.BrowserWindow;
   const win = new BrowserWindow({width: 1000,frame: false, transparent : true, height: 600, backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico',webPreferences: { nodeIntegration: true }});
   win.loadFile('runner.html');
+}
+
+function serialize_current_state() {
+    return JSON.stringify({
+        "url":document.getElementById("parse_url").value,
+          "return_content":editor.session.getValue(),
+          "headers":getheaders(),
+          "return_headers": document.getElementById("return_headers").innerText,
+          "body":body_editor.session.getValue(),
+          "content_type":document.getElementById("content_type").value,
+          "current_request_type":document.getElementById("request_type").value,
+    })
 }
