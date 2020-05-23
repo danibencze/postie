@@ -446,18 +446,14 @@ function update_app() {
     xmlHttp.open( "GET", "https://api.github.com/repos/danibencze/postie/releases/latest", false);
     xmlHttp.send();
     var most_recent_availible = JSON.parse(xmlHttp.responseText);
+    console.log(parseInt(current_version));
     if (parseInt(most_recent_availible["tag_name"].replace(/\./g,""))>parseInt(current_version)){
         console.log("Start update");
         document.getElementById("update_btn").innerHTML ="<div class='loader'></div>";
         console.log(most_recent_availible["assets"][0]["browser_download_url"]);
-        const https = require('https');
-        const fs = require('fs');
-
-        const file = fs.createWriteStream(most_recent_availible["assets"][0]["name"]);
-        const request = https.get(most_recent_availible["assets"][0]["browser_download_url"], function(response) {
-            response.pipe(file);
-            document.getElementById("update_btn").innerHTML ="You can find the new version in the same location"
-        });
+        document.getElementById('update_btn').onclick = null;
+        document.getElementById("update_btn").innerHTML ='A new version is found and can be downloaded from <a id="update_link" href="'+most_recent_availible["assets"][0]["browser_download_url"]+'">here</a>';
+        document.getElementById("update_link").click()
     }else{
         console.log("You are up to date");
         document.getElementById("update_btn").style.borderColor = "#28a745";
