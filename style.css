@@ -354,8 +354,8 @@ textarea {
 .change .bar2 {opacity: 0;}
 
 .change .bar3 {
-  -webkit-transform: rotate(45deg) translate(-5px, 0px);
-  transform: rotate(45deg) translate(-5px,0px);
+  -webkit-transform: rotate(45deg) translate(-6px, 0px);
+  transform: rotate(45deg) translate(-6px,0px);
 }
 
 .bar-btn:active{
