@@ -7,6 +7,8 @@ const electron = require('electron');
       );
 var obj = JSON.parse(fs.readFileSync(path.join(userDataPath,'status.json'), 'utf8'));
 document.getElementById("parse_url").value = obj["current_url"];
+document.getElementById("request_type").value = obj["current_request_type"];
+console.log(obj);
 var os = require('os');
 try {
     // get recommended number of threads based on number of cores
@@ -35,7 +37,7 @@ function call_api(mock){
     var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
     var xmlHttp = new XMLHttpRequest();
     var start = Date.now();
-    xmlHttp.open( "GET", mock[1], false);
+    xmlHttp.open(mock[2],mock[1], false);
     xmlHttp.send();
     return [mock[0],xmlHttp.status,(Date.now()-start)]
 }
@@ -50,10 +52,12 @@ function map_processes(){
     var list = [];
     var req_count = document.getElementById("iterations").value;
     create_progress_child("Sending "+req_count + " requests");
+    var http_method = $("#request_type :selected").text();
     for (var i = 1; i <= req_count; i++) {
         var interlist = [];
         interlist.push(i);
         interlist.push(url);
+        interlist.push(http_method);
         list.push(interlist);
     }
     var startrunner = Date.now();
