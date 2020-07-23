@@ -139,15 +139,15 @@
             </button>
           </div>
         <div class="input-group-append">
-          <button onclick="sendrequest()" class="form-control btn bar-btn"  type="button">Go</button>
+          <button id="gobutton" onclick="sendrequest()" class="form-control btn bar-btn"  type="button">Go</button>
         </div>
         </div>
         <div style="display: inline-flex; width: 100%">
           <nav aria-label="breadcrumb" style="width: 85%">
-            <ol id="tracker" class="breadcrumb" style="background-color: white">Ready
+            <ol id="tracker" class="breadcrumb custom-shadow" style="background-color: white">Ready
             </ol>
           </nav>
-          <button onclick="spawn_runner_window()" class="form-control btn bar-btn runner-btn"  type="button">Runner</button>
+          <button onclick="spawn_runner_window()" class="form-control btn bar-btn runner-btn custom-shadow"  type="button">Runner</button>
         </div>
         <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
@@ -173,7 +173,7 @@
           <textarea style="height: 100%" id="raw_response"></textarea>
         </div>
         <div class="tab-pane fade" id="html" role="tabpanel" aria-labelledby="html-tab" style="height: calc(100% - 164px)">
-          <iframe id="html_iframe" style="height:100%;width: 100%;"></iframe>
+          <iframe id="html_iframe" style="height:100%;width: 100%;" sandbox></iframe>
         </div>
       </div>
     </div></div>

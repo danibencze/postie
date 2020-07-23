@@ -23,9 +23,9 @@
         });
 
       function btfy() {
-          console.log(editor.session.getMode().$id);
+          //console.log(editor.session.getMode().$id);
           if(editor.session.getMode().$id==="ace/mode/javascript"){
-              console.log("btfy:OK");
+              //console.log("btfy:OK");
               var val = editor.session.getValue();
             //Remove leading spaces
               var array = val.split(/\n/);
@@ -52,7 +52,7 @@
       //TODO: Finish off autosave functions
       //TODO: Also to load in the saved data
       $(".autosave").on("input",debounce(function() {
-          console.log("Change to " + this.value);
+          //console.log("Change to " + this.value);
           save_all();
       },1000));
 
@@ -91,7 +91,7 @@
         }else{
           history_option = "no_track"
         }
-        console.log(history_option);
+        //console.log(history_option);
         var settings = JSON.stringify({
           "history":history_option,
         });
@@ -106,15 +106,15 @@
       function startupload() {
         try{
           var obj = JSON.parse(fs.readFileSync(path.join(userDataPath,'status.json'), 'utf8'));
-          console.log(obj["headers"]);
+          //console.log(obj["headers"]);
           //TODO: Create function for header creation from arrays
           for (let i = 0; i < obj["headers"].length; i++) {
-              console.log("trying..");
+              //console.log("trying..");
               add_header();
-              console.log("header created");
+              //console.log("header created");
               document.getElementById((i+1)+"_header_key").value = obj["headers"][i][0];
               document.getElementById((i+1)+"_header_value").value = obj["headers"][i][1];
-              console.log("bits added")
+              //console.log("bits added")
           }
           display_header_count();
           body_editor.session.setValue(obj["body"]);
@@ -153,6 +153,74 @@
       }
 
 function sendrequest() {
+    reset_ui();
+    reset_progress();
+    document.getElementById("gobutton").innerHTML="<div class='loader'></div>";
+    var url = document.getElementById("parse_url").value;
+    if (testurl(document.getElementById("parse_url").value)){
+        create_progress_child("URL: ok")
+    }else{
+        create_progress_child("URL: Schema not correct");
+        return false
+    }
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onerror = function (errorc){console.log("error")};
+    xmlHttp.onreadystatechange = function (oEvent) {
+        //console.log(oEvent);
+        if (xmlHttp.readyState === 4) {
+                document.getElementById("gobutton").innerHTML="Go";
+                var t1 = performance.now();
+                create_progress_child("Time: "+Math.round((t1 - t0))+" ms");
+                create_progress_child("Status: "+xmlHttp.status);
+                create_progress_child("Headers: "+(xmlHttp.getAllResponseHeaders().split(/:+\s/).length-1));
+                create_progress_child("Response: "+xmlHttp.response.length+" char");
+                document.getElementById("return_headers").innerText = xmlHttp.getAllResponseHeaders();
+                editor.setValue(xmlHttp.response);
+                var returnheader = xmlHttp.getResponseHeader("content-type");
+                if (returnheader==="application/json" || returnheader.includes("json")){
+                    editor.session.setMode("ace/mode/javascript");
+                    btfy();
+                }else if (returnheader.includes("xml")){
+                    editor.session.setMode("ace/mode/xml");
+                }else if (returnheader.includes("html")){
+                    editor.session.setMode("ace/mode/html");
+                } else{
+                    editor.session.setMode("ace/mode/plain_text");
+                }
+                document.getElementById("html_iframe").srcdoc = xmlHttp.response;
+                document.getElementById("raw_response").value = xmlHttp.response;
+                create_history(url,xmlHttp.status);
+                save_all();
+                return xmlHttp.response;
+        }
+    };
+    var all_headers_list = document.getElementById("headers_modal_content").children;
+    //console.log(all_headers_list);
+    xmlHttp.open( $("#request_type :selected").text(), url, true);
+    for (var index = 0; index < all_headers_list.length; ++index) {
+        var main_id = all_headers_list[index].id;
+        xmlHttp.setRequestHeader(document.getElementById(main_id+"_key").value, document.getElementById(main_id+"_value").value);
+
+    }
+    var content_type= $("#content_type :selected").val();
+    if (content_type !== "0"){
+        xmlHttp.setRequestHeader("Content-type",content_type)
+    }
+    //console.log("headres here");
+    //console.log(xmlHttp.headers);
+    var t0 = performance.now();
+    try {
+        //TODO: Fix this weird JSON error
+        //console.log(body_editor.session.getValue());
+        var payload = body_editor.session.getValue();
+        //console.log(payload);
+        xmlHttp.send(payload);
+    }catch (e) {
+        console.log("error catch")
+    }
+}
+
+function sendrequest_old() {
     //TODO: add https://forums.asp.net/t/1129474.aspx?How+can+i+use+xmlhttp+to+request+a+https+url
     reset_progress();
     var url = document.getElementById("parse_url").value;
@@ -165,10 +233,10 @@ function sendrequest() {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onerror = function (errorc){console.log("error")};
     xmlHttp.onreadystatechange = function (oEvent) {
-        console.log(oEvent);
+        //console.log(oEvent);
         if (xmlHttp.readyState === 4) {
             if (xmlHttp.status === 200) {
-              console.log(xmlHttp.responseText)
+              //console.log(xmlHttp.responseText)
             } else {
                console.log("Error", xmlHttp.statusText);
             }
@@ -176,8 +244,8 @@ function sendrequest() {
     };
 
     var all_headers_list = document.getElementById("headers_modal_content").children;
-    console.log(all_headers_list);
-    xmlHttp.open( $("#request_type :selected").text(), url, false);
+    //console.log(all_headers_list);
+    xmlHttp.open( $("#request_type :selected").text(), url, true);
     for (var index = 0; index < all_headers_list.length; ++index) {
         var main_id = all_headers_list[index].id;
         xmlHttp.setRequestHeader(document.getElementById(main_id+"_key").value, document.getElementById(main_id+"_value").value);
@@ -187,14 +255,14 @@ function sendrequest() {
     if (content_type !== "0"){
         xmlHttp.setRequestHeader("Content-type",content_type)
     }
-    console.log("headres here");
-    console.log(xmlHttp.headers);
+    //console.log("headres here");
+    //console.log(xmlHttp.headers);
     var t0 = performance.now();
     try {
         //TODO: Fix this weird JSON error
-        console.log(body_editor.session.getValue());
+        //console.log(body_editor.session.getValue());
         var payload = body_editor.session.getValue();
-        console.log(payload);
+        //console.log(payload);
         xmlHttp.send(payload);
     }catch (e) {
         console.log("error catch")
@@ -419,10 +487,10 @@ function filter_history() {
 function reload_history_elem(element){
     reset_ui();
     document.getElementById("parse_url").value = element.innerText.split("\n")[1];
-    console.log(element.children);
+    // console.log(element.children);
     if (element.querySelector(".datastore")){
         var history_element = JSON.parse(element.querySelector(".datastore").innerText);
-        console.log(history_element);
+        //console.log(history_element);
         body_editor.session.setValue(history_element["body"]);
         editor.session.setValue(history_element["return_content"]);
         document.getElementById("content_type").value = history_element["content_type"];
