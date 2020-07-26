@@ -515,3 +515,11 @@ input:checked + .slider:before {
   border: 1px solid #b3b9bf;
 }
 
+.abort{
+  font-size: 1em;
+  color: red;
+  width: 20px;
+  height: 20px;
+  font-weight: bolder;
+}
+

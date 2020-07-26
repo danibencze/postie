@@ -1,161 +1,168 @@
-      var path = require("path");
-      var fs = require('fs');
-      const debounce = (func, delay) => {
-        let inDebounce;
-        return function() {
-          const context = this;
-          const args = arguments;
-          clearTimeout(inDebounce);
-          inDebounce = setTimeout(() => func.apply(context, args), delay)
-        }
-      };
-      const electron = require('electron');
-      //init appdata to store metadata locally
-      const userDataPath = (electron.app || electron.remote.app).getPath(
-        'userData'
-      );
-      console.log(userDataPath);
+var path = require("path");
+var fs = require('fs');
+var current_request = "";
 
-      $("#parse_url").on('keyup', function (e) {
-        if (e.keyCode === 13) {
-            sendrequest();
-            }
-        });
+const debounce = (func, delay) => {
+  let inDebounce;
+  return function() {
+    const context = this;
+    const args = arguments;
+    clearTimeout(inDebounce);
+    inDebounce = setTimeout(() => func.apply(context, args), delay)
+  }
+};
 
-      function btfy() {
-          //console.log(editor.session.getMode().$id);
-          if(editor.session.getMode().$id==="ace/mode/javascript"){
-              //console.log("btfy:OK");
-              var val = editor.session.getValue();
-            //Remove leading spaces
-              var array = val.split(/\n/);
-              array[0] = array[0].trim();
-              val = array.join("\n");
-            //Actual beautify (prettify)
-              val = beautify(val);
-            //Change current text to formatted text
-              editor.session.setValue(val);
-          }
+const electron = require('electron');
+//init appdata to store metadata locally
+const userDataPath = (electron.app || electron.remote.app).getPath(
+  'userData'
+);
+
+console.log(userDataPath);
+
+
+$("#parse_url").on('keyup', function (e) {
+  if (e.keyCode === 13) {
+      sendrequest();
       }
+});
 
-      function settingstoggle(x) {
-        x.classList.toggle("change");
-        if (x.classList.contains("change")){
-          document.getElementById("settings-tab").style.display ="block";
-          document.getElementById("main").style.display ="none"
-        }else{
-          document.getElementById("main").style.display ="inline-flex";
-          document.getElementById("settings-tab").style.display ="none";
-        }
-      }
+function btfy() {
+    //console.log(editor.session.getMode().$id);
+    if(editor.session.getMode().$id==="ace/mode/javascript"){
+        //console.log("btfy:OK");
+        var val = editor.session.getValue();
+      //Remove leading spaces
+        var array = val.split(/\n/);
+        array[0] = array[0].trim();
+        val = array.join("\n");
+      //Actual beautify (prettify)
+        val = beautify(val);
+      //Change current text to formatted text
+        editor.session.setValue(val);
+    }
+}
 
-      //TODO: Finish off autosave functions
-      //TODO: Also to load in the saved data
-      $(".autosave").on("input",debounce(function() {
-          //console.log("Change to " + this.value);
-          save_all();
-      },1000));
+function settingstoggle(x) {
+  x.classList.toggle("change");
+  if (x.classList.contains("change")){
+    document.getElementById("settings-tab").style.display ="block";
+    document.getElementById("main").style.display ="none"
+  }else{
+    document.getElementById("main").style.display ="inline-flex";
+    document.getElementById("settings-tab").style.display ="none";
+  }
+}
 
-      function getheaders() {
-          var headers = [];
-          for (let i = 1; i <= document.getElementById("headers_modal_content").children.length; i++) {
-              console.log("saving");
-              var interheaders = [];
-              interheaders.push(document.getElementById(i+"_header_key").value);
-              interheaders.push(document.getElementById(i+"_header_value").value);
-              headers.push(interheaders)
-          }
-          return headers
-      }
+//TODO: Finish off autosave functions
+//TODO: Also to load in the saved data
+$(".autosave").on("input",debounce(function() {
+    //console.log("Change to " + this.value);
+    save_all();
+},1000));
 
-      function save_all() {
-        var content = JSON.stringify({
-          "current_url":document.getElementById("parse_url").value,
-          "return_content":editor.session.getValue(),
-          "headers":getheaders(),
-          "return_headers": document.getElementById("return_headers").innerHTML,
-          "body":body_editor.session.getValue(),
-          "search_bar":document.getElementById("history_filter").value,
-          "content_type":document.getElementById("content_type").value,
-          "current_request_type":document.getElementById("request_type").value,
-          "history-grouping":document.getElementById("history-grouping").checked,
-          "history":document.getElementById("history_scroll").innerHTML
-        });
-        try { fs.writeFileSync(path.join(userDataPath,'status.json'), content, 'utf-8'); }
-        catch(e) { console.log(e) }
-        var history_option = "";
-        if(document.getElementById("minimal_track").checked){
-          history_option = "minimal_track"
-        }else if(document.getElementById("full_track").checked){
-            history_option = "full_track"
-        }else{
-          history_option = "no_track"
-        }
-        //console.log(history_option);
-        var settings = JSON.stringify({
-          "history":history_option,
-        });
-        try { fs.writeFileSync(path.join(userDataPath,'settings.json'), settings, 'utf-8'); }
-        catch(e) { console.log(e) }
-      }
+function getheaders() {
+    var headers = [];
+    for (let i = 1; i <= document.getElementById("headers_modal_content").children.length; i++) {
+        console.log("saving");
+        var interheaders = [];
+        interheaders.push(document.getElementById(i+"_header_key").value);
+        interheaders.push(document.getElementById(i+"_header_value").value);
+        headers.push(interheaders)
+    }
+    return headers
+}
 
-      function body_length_count() {
-      document.getElementById("bodylength").innerText = body_editor.session.getValue().length;
-      }
+function save_all() {
+  var content = JSON.stringify({
+    "current_url":document.getElementById("parse_url").value,
+    "return_content":editor.session.getValue(),
+    "headers":getheaders(),
+    "return_headers": document.getElementById("return_headers").innerHTML,
+    "body":body_editor.session.getValue(),
+    "search_bar":document.getElementById("history_filter").value,
+    "content_type":document.getElementById("content_type").value,
+    "current_request_type":document.getElementById("request_type").value,
+    "history-grouping":document.getElementById("history-grouping").checked,
+    "history":document.getElementById("history_scroll").innerHTML
+  });
+  try { fs.writeFileSync(path.join(userDataPath,'status.json'), content, 'utf-8'); }
+  catch(e) { console.log(e) }
+  var history_option = "";
+  if(document.getElementById("minimal_track").checked){
+    history_option = "minimal_track"
+  }else if(document.getElementById("full_track").checked){
+      history_option = "full_track"
+  }else{
+    history_option = "no_track"
+  }
+  //console.log(history_option);
+  var settings = JSON.stringify({
+    "history":history_option,
+  });
+  try { fs.writeFileSync(path.join(userDataPath,'settings.json'), settings, 'utf-8'); }
+  catch(e) { console.log(e) }
+}
 
-      function startupload() {
-        try{
-          var obj = JSON.parse(fs.readFileSync(path.join(userDataPath,'status.json'), 'utf8'));
-          //console.log(obj["headers"]);
-          //TODO: Create function for header creation from arrays
-          for (let i = 0; i < obj["headers"].length; i++) {
-              //console.log("trying..");
-              add_header();
-              //console.log("header created");
-              document.getElementById((i+1)+"_header_key").value = obj["headers"][i][0];
-              document.getElementById((i+1)+"_header_value").value = obj["headers"][i][1];
-              //console.log("bits added")
-          }
-          display_header_count();
-          body_editor.session.setValue(obj["body"]);
-          document.getElementById("parse_url").value = obj["current_url"];
-          document.getElementById("history_filter").value = obj["search_bar"];
-          editor.session.setValue(obj["return_content"]);
-          document.getElementById("request_type").value = obj["current_request_type"];
-          document.getElementById("return_headers").innerText = obj["return_headers"];
-          document.getElementById("raw_response").value = obj["return_content"];
-          document.getElementById("content_type").value = obj["content_type"];
-          document.getElementById("history-grouping").checked = obj["history-grouping"];
-          if (obj["history"]) {
-            document.getElementById("history_scroll").innerHTML = obj["history"];
-          }
-          $('#content_type').trigger("change");
-          display_header_count();
-          btfy();
-          body_length_count();
-        }catch (e) {
-          console.log("No config file found")
-        }
-        var settings = {};
-        try{
-          settings = JSON.parse(fs.readFileSync(path.join(userDataPath,'settings.json'), 'utf8'));
-        }catch (e) {
-          console.log("No settings... going default it is")
-        }
-        console.log(settings);
-        if(settings["history"]){
-          document.getElementById(settings["history"]).checked = true;
-          document.getElementById(settings["history"]+"_label").classList.add("active");
-        }else{
-          document.getElementById("full_track").checked = true;
-          document.getElementById("full_track_label").classList.add("active")
-        }
-      }
+
+function body_length_count() {
+document.getElementById("bodylength").innerText = body_editor.session.getValue().length;
+}
+
+
+function startupload() {
+  try{
+    var obj = JSON.parse(fs.readFileSync(path.join(userDataPath,'status.json'), 'utf8'));
+    //console.log(obj["headers"]);
+    //TODO: Create function for header creation from arrays
+    for (let i = 0; i < obj["headers"].length; i++) {
+        //console.log("trying..");
+        add_header();
+        //console.log("header created");
+        document.getElementById((i+1)+"_header_key").value = obj["headers"][i][0];
+        document.getElementById((i+1)+"_header_value").value = obj["headers"][i][1];
+        //console.log("bits added")
+    }
+    display_header_count();
+    body_editor.session.setValue(obj["body"]);
+    document.getElementById("parse_url").value = obj["current_url"];
+    document.getElementById("history_filter").value = obj["search_bar"];
+    editor.session.setValue(obj["return_content"]);
+    document.getElementById("request_type").value = obj["current_request_type"];
+    document.getElementById("return_headers").innerText = obj["return_headers"];
+    document.getElementById("raw_response").value = obj["return_content"];
+    document.getElementById("content_type").value = obj["content_type"];
+    document.getElementById("history-grouping").checked = obj["history-grouping"];
+    if (obj["history"]) {
+      document.getElementById("history_scroll").innerHTML = obj["history"];
+    }
+    $('#content_type').trigger("change");
+    display_header_count();
+    btfy();
+    body_length_count();
+  }catch (e) {
+    console.log("No config file found")
+  }
+  var settings = {};
+  try{
+    settings = JSON.parse(fs.readFileSync(path.join(userDataPath,'settings.json'), 'utf8'));
+  }catch (e) {
+    console.log("No settings... going default it is")
+  }
+  console.log(settings);
+  if(settings["history"]){
+    document.getElementById(settings["history"]).checked = true;
+    document.getElementById(settings["history"]+"_label").classList.add("active");
+  }else{
+    document.getElementById("full_track").checked = true;
+    document.getElementById("full_track_label").classList.add("active")
+  }
+}
 
 function sendrequest() {
     reset_ui();
     reset_progress();
-    document.getElementById("gobutton").innerHTML="<div class='loader'></div>";
+    change_to_loader();
     var url = document.getElementById("parse_url").value;
     if (testurl(document.getElementById("parse_url").value)){
         create_progress_child("URL: ok")
@@ -164,11 +171,12 @@ function sendrequest() {
         return false
     }
     var xmlHttp = new XMLHttpRequest();
+    current_request = xmlHttp;
     xmlHttp.onerror = function (errorc){console.log("error")};
     xmlHttp.onreadystatechange = function (oEvent) {
         //console.log(oEvent);
         if (xmlHttp.readyState === 4) {
-                document.getElementById("gobutton").innerHTML="Go";
+                reset_go_button();
                 var t1 = performance.now();
                 var timedelta = Math.round((t1 - t0));
                 if (timedelta >= 1000){
@@ -182,15 +190,19 @@ function sendrequest() {
                 document.getElementById("return_headers").innerText = xmlHttp.getAllResponseHeaders();
                 editor.setValue(xmlHttp.response);
                 var returnheader = xmlHttp.getResponseHeader("content-type");
-                if (returnheader==="application/json" || returnheader.includes("json")){
-                    editor.session.setMode("ace/mode/javascript");
-                    btfy();
-                }else if (returnheader.includes("xml")){
-                    editor.session.setMode("ace/mode/xml");
-                }else if (returnheader.includes("html")){
-                    editor.session.setMode("ace/mode/html");
-                } else{
-                    editor.session.setMode("ace/mode/plain_text");
+                try{
+                    if (returnheader==="application/json" || returnheader.includes("json")){
+                        editor.session.setMode("ace/mode/javascript");
+                        btfy();
+                    }else if (returnheader.includes("xml")){
+                        editor.session.setMode("ace/mode/xml");
+                    }else if (returnheader.includes("html")){
+                        editor.session.setMode("ace/mode/html");
+                    } else{
+                        editor.session.setMode("ace/mode/plain_text");
+                    }
+                }catch (e) {
+                    console.log("No headers")
                 }
                 document.getElementById("html_iframe").srcdoc = xmlHttp.response;
                 document.getElementById("raw_response").value = xmlHttp.response;
@@ -224,6 +236,22 @@ function sendrequest() {
         console.log("error catch")
     }
 }
+
+
+function change_go_to_abort() {
+    document.getElementById("gobutton").innerHTML="<div onmouseout='change_to_loader()' id='abort_request' class='abort'>X</div>";
+    document.getElementById("gobutton").onclick = function (){current_request.abort();};
+}
+
+function change_to_loader() {
+    document.getElementById("gobutton").innerHTML="<div onmouseover='change_go_to_abort()' class='loader'></div>";
+}
+
+function reset_go_button() {
+    document.getElementById("gobutton").innerHTML="Go";
+    document.getElementById("gobutton").onclick = function (){sendrequest();};
+}
+
 
 function sendrequest_old() {
     //TODO: add https://forums.asp.net/t/1129474.aspx?How+can+i+use+xmlhttp+to+request+a+https+url
@@ -441,7 +469,8 @@ function create_history(url,status) {
         node.appendChild(pres_url);
         var d = Date.now();
         d = new Date(d);
-        d = (d.getDate() + '/' + d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + (d.getHours() > 12 ? d.getHours() - 12 : d.getHours()) + ':' + d.getMinutes() + ' ' + (d.getHours() >= 12 ? "PM" : "AM");
+        var month = d.getMonth() + 1;
+        d = (d.getDate() + '/' + month) + '/' + d.getFullYear() + ' ' + (d.getHours() > 12 ? d.getHours() - 12 : d.getHours()) + ':' + d.getMinutes() + ' ' + (d.getHours() >= 12 ? "PM" : "AM");
         node.appendChild(document.createTextNode(d));
         if (document.getElementById("full_track").checked){
             var datastore = document.createElement("DIV");
