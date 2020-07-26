@@ -510,3 +510,8 @@ input:checked + .slider:before {
     right: 3%;
 }
 
+.standard_color{
+  background-color: #f1f1f1;
+  border: 1px solid #b3b9bf;
+}
+

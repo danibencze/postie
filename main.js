@@ -7,7 +7,7 @@ let mainWindow;
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1300, height: 900, frame: false,resizable: true, transparent : true, backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico',webPreferences: {
+  mainWindow = new BrowserWindow({width: 1300, height: 900, frame: false,resizable: true,  backgroundColor: '#FFF',icon: __dirname + 'postielogo/icon.ico',webPreferences: {
             nodeIntegration: true
         }});
 

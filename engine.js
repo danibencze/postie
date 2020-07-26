@@ -170,7 +170,12 @@ function sendrequest() {
         if (xmlHttp.readyState === 4) {
                 document.getElementById("gobutton").innerHTML="Go";
                 var t1 = performance.now();
-                create_progress_child("Time: "+Math.round((t1 - t0))+" ms");
+                var timedelta = Math.round((t1 - t0));
+                if (timedelta >= 1000){
+                    create_progress_child("Time: "+(timedelta/1000)+" s");
+                }else{
+                    create_progress_child("Time: "+timedelta+" ms");
+                }
                 create_progress_child("Status: "+xmlHttp.status);
                 create_progress_child("Headers: "+(xmlHttp.getAllResponseHeaders().split(/:+\s/).length-1));
                 create_progress_child("Response: "+xmlHttp.response.length+" char");
@@ -208,12 +213,12 @@ function sendrequest() {
     }
     //console.log("headres here");
     //console.log(xmlHttp.headers);
-    var t0 = performance.now();
     try {
         //TODO: Fix this weird JSON error
         //console.log(body_editor.session.getValue());
         var payload = body_editor.session.getValue();
         //console.log(payload);
+        var t0 = performance.now();
         xmlHttp.send(payload);
     }catch (e) {
         console.log("error catch")
