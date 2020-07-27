@@ -240,16 +240,19 @@ function sendrequest() {
 
 function change_go_to_abort() {
     document.getElementById("gobutton").innerHTML="<div onmouseout='change_to_loader()' id='abort_request' class='abort'>X</div>";
+    document.getElementById("gobutton").style.backgroundColor = "#dc3545";
     document.getElementById("gobutton").onclick = function (){current_request.abort();};
 }
 
 function change_to_loader() {
     document.getElementById("gobutton").innerHTML="<div onmouseover='change_go_to_abort()' class='loader'></div>";
+    document.getElementById("gobutton").style.backgroundColor = "transparent";
 }
 
 function reset_go_button() {
     document.getElementById("gobutton").innerHTML="Go";
     document.getElementById("gobutton").onclick = function (){sendrequest();};
+    document.getElementById("gobutton").style.backgroundColor = "transparent";
 }
 
 

@@ -517,9 +517,30 @@ input:checked + .slider:before {
 
 .abort{
   font-size: 1em;
-  color: red;
+  color: white;
   width: 20px;
   height: 20px;
   font-weight: bolder;
+  background-color: transparent;
+}
+
+div#dropZone {
+  background: #272727;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  opacity: 0.6;
+  visibility: hidden;
+  padding-top: 30%;
+  font-size: 2rem;
+  text-align: center;
+  color: white;
+  border: 4px dashed white;
+  -webkit-transition: box-shadow 0.3s, border-color 0.3s;
+    -moz-transition: box-shadow 0.3s, border-color 0.3s;
+    transition: box-shadow 0.3s, border-color 0.3s;
 }
 
