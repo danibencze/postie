@@ -160,7 +160,6 @@ function startupload() {
 }
 
 function sendrequest() {
-    reset_ui();
     reset_progress();
     change_to_loader();
     var url = document.getElementById("parse_url").value;
@@ -220,16 +219,18 @@ function sendrequest() {
 
     }
     var content_type= $("#content_type :selected").val();
+    //TODO: Content type header not being set
     if (content_type !== "0"){
+        console.log("Setting header");
         xmlHttp.setRequestHeader("Content-type",content_type)
     }
     //console.log("headres here");
-    //console.log(xmlHttp.headers);
+    console.log(xmlHttp.headers);
     try {
         //TODO: Fix this weird JSON error
-        //console.log(body_editor.session.getValue());
+        console.log(body_editor.session.getValue());
         var payload = body_editor.session.getValue();
-        //console.log(payload);
+        console.log(payload);
         var t0 = performance.now();
         xmlHttp.send(payload);
     }catch (e) {
@@ -458,7 +459,11 @@ function create_history(url,status) {
     if(document.getElementById("minimal_track").checked || document.getElementById("full_track").checked  ) {
         var node = document.createElement("LI");
         node.classList.add("list-group-item");
+        node.classList.add("task");
         node.setAttribute("onclick", "reload_history_elem(this)");
+        var history_id = "history_"+document.getElementById("history_scroll").children.length.toString();
+        node.setAttribute("data-id",history_id);
+        node.id = history_id;
         var pres_url = document.createElement("B");
         var status_indicator = document.createElement("SPAN");
         if (status.toString().indexOf("2") === 0) {
@@ -480,6 +485,7 @@ function create_history(url,status) {
             datastore.innerText = serialize_current_state();
             datastore.style.display = "none";
             datastore.classList.add("datastore");
+            datastore.id = history_id+"_store";
             node.appendChild(datastore)
         }
         var list = document.getElementById("history_scroll");
@@ -527,7 +533,8 @@ function reload_history_elem(element){
     // console.log(element.children);
     if (element.querySelector(".datastore")){
         var history_element = JSON.parse(element.querySelector(".datastore").innerText);
-        //console.log(history_element);
+        console.log(history_element);
+        document.getElementById("parse_url").value = history_element["url"];
         body_editor.session.setValue(history_element["body"]);
         editor.session.setValue(history_element["return_content"]);
         document.getElementById("content_type").value = history_element["content_type"];
