@@ -220,16 +220,22 @@
    * @param {HTMLElement} link The link that was clicked
    */
   function menuItemListener( link ) {
-    console.log( "Task ID - " + taskItemInContext.getAttribute("data-id") + ", Task action - " + link.getAttribute("data-action"));
+    console.log( "ID - " + taskItemInContext.getAttribute("data-id") + ", Action - " + link.getAttribute("data-action"));
     toggleMenuOff();
     if(link.getAttribute("data-action") === "Delete"){
       document.getElementById(taskItemInContext.getAttribute("data-id")).remove();
     }else if (link.getAttribute("data-action") === "Save"){
       const content = document.getElementById(taskItemInContext.getAttribute("data-id")+"_store").innerText;
+      var save_name = taskItemInContext.getAttribute("data-id");
+      try {
+         save_name = JSON.parse(content)["url"].split("/")[2].split(".").join("_") +"_"+ taskItemInContext.getAttribute("data-id");
+      }catch {
+        console.log("Couldn't fetch url details")
+      }
       const element = document.createElement("a");
       const file = new Blob([content], {type: "text/plain"});
       element.href = URL.createObjectURL(file);
-      element.download = taskItemInContext.getAttribute("data-id")+".postie";
+      element.download = save_name+".postie";
       element.click();
     }
   }

@@ -167,6 +167,7 @@ function sendrequest() {
         create_progress_child("URL: ok")
     }else{
         create_progress_child("URL: Schema not correct");
+        reset_go_button();
         return false
     }
     var xmlHttp = new XMLHttpRequest();
@@ -489,7 +490,14 @@ function create_history(url,status) {
             node.appendChild(datastore)
         }
         var list = document.getElementById("history_scroll");
-        if(document.getElementById("history-grouping").checked && list.childNodes[0].getElementsByTagName("B")[0].innerText===url){
+        //TODO: When no elements are present it breaks the second statement
+        var last_url = "";
+        try {
+            last_url = list.childNodes[0].getElementsByTagName("B")[0].innerText
+        }catch (e) {
+            console.log("No history")
+        }
+        if(document.getElementById("history-grouping").checked && last_url===url){
             var counter = document.createElement("SPAN");
             counter.classList.add("badge");
             counter.classList.add("badge-info");
