@@ -17744,6 +17744,7 @@ overflow-y: scroll;\
 top: 0;\
 }\
 .ace_scrollbar-h {\
+height:2px!important;\
 overflow-x: scroll;\
 overflow-y: hidden;\
 left: 0;\

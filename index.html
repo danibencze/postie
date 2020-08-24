@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html id="mainbod">
   <head>
     <meta charset="UTF-8">
     <title>Postie</title>
@@ -9,6 +9,9 @@
 
 
   </head>
+<div id="dropZone">
+  Drop to import
+</div>
   <body>
 
     <header id="titlebar">
@@ -55,6 +58,12 @@
               <input type="radio" name="options" class="history_settings" id="full_track" autocomplete="off"> Everything (URL, Body, Response, etc.)
             </label>
           </div>
+          <div style="margin-top: 5%">Group requests for the same url in history:
+            <label class="switch">
+              <input id="history-grouping" type="checkbox">
+              <span class="slider round"></span>
+            </label>
+          </div>
         </div>
       </div>
       <hr>
@@ -80,7 +89,7 @@
       <div style="height: 5%;width: 100%;margin-bottom: 2%">
         <div class="input-group input-group-sm mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text" id="inputGroup-sizing-sm">Search</span>
+            <span class="input-group-text standard_color" id="inputGroup-sizing-sm">Search</span>
           </div>
           <input oninput="filter_history()" id="history_filter" type="text" class="form-control" aria-label="Seach" aria-describedby="inputGroup-sizing-sm">
         </div>
@@ -88,7 +97,7 @@
         <ul class="list-group" id="history_scroll">
         </ul>
     </div>
-      <div style="width: 85%">
+      <div style="width: 85%;height: 99%">
         <div id="headers_modal" class="modal">
           <!-- Modal content -->
           <div class="modal-content">
@@ -133,15 +142,15 @@
             </button>
           </div>
         <div class="input-group-append">
-          <button onclick="sendrequest()" class="form-control btn bar-btn"  type="button">Go</button>
+          <button id="gobutton" onclick="sendrequest()" class="form-control btn bar-btn"  type="button">Go</button>
         </div>
         </div>
         <div style="display: inline-flex; width: 100%">
           <nav aria-label="breadcrumb" style="width: 85%">
-            <ol id="tracker" class="breadcrumb" style="background-color: white">Ready
+            <ol id="tracker" class="breadcrumb custom-shadow" style="background-color: white">Ready
             </ol>
           </nav>
-          <button onclick="spawn_runner_window()" class="form-control btn bar-btn runner-btn"  type="button">Runner</button>
+          <button onclick="spawn_runner_window()" class="form-control btn bar-btn runner-btn custom-shadow"  type="button">Runner</button>
         </div>
         <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
@@ -167,11 +176,20 @@
           <textarea style="height: 100%" id="raw_response"></textarea>
         </div>
         <div class="tab-pane fade" id="html" role="tabpanel" aria-labelledby="html-tab" style="height: calc(100% - 164px)">
-          <iframe id="html_iframe" style="height:100%;width: 100%;"></iframe>
+          <iframe id="html_iframe" style="height:100%;width: 100%;" sandbox></iframe>
         </div>
       </div>
     </div></div>
-
+    <nav id="context-menu" class="context-menu">
+    <ul class="context-menu__items">
+      <li class="context-menu__item">
+        <a href="#" class="context-menu__link" data-action="Save"><i class="fa fa-eye"></i> Save to file</a>
+      </li>
+      <li class="context-menu__item">
+        <a href="#" class="context-menu__link" data-action="Delete"><i class="fa fa-times"></i> Delete </a>
+      </li>
+    </ul>
+  </nav>
     <script>
       require('./renderer.js');
     </script>
@@ -191,6 +209,8 @@
     <script>require('bootstrap');</script>
     <script>var beautify = require('js-beautify').js</script>
     <script src="engine.js"></script>
+    <script src="scripts/dragndrop.js"></script>
+    <script src="scripts/contextmenu.js"></script>
     <script>
       startupload();
     </script>
