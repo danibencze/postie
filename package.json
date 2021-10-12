@@ -20,7 +20,7 @@
   "author": "Dani Bencze",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^7.2.4"
+    "electron": "^11.5.0"
   },
   "dependencies": {
     "bootstrap": "^4.1.3",
