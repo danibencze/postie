@@ -32,7 +32,7 @@
     "popper.js": "^1.14.4",
     "rimraf": "^3.0.0",
     "xmlhttprequest": "^1.8.0",
-    "minimist": ">=1.2.3"
+    "minimist": ">=1.2.6"
   },
   "bugs": {
     "url": "https://github.com/danibencze/postie/issues"
